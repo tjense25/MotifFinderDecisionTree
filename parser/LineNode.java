@@ -1,3 +1,5 @@
+package parser;
+
 /**
  * Created by tjense25 on 1/19/18.
  */
@@ -21,7 +23,7 @@ public class LineNode {
     public LineNode(LineNode line) {
         this.depth = line.depth;
         this.pos = line.pos;
-        this.r = r;
+        this.r = line.r;
     }
 
     public int getDepth() {
@@ -50,7 +52,7 @@ public class LineNode {
     }
 
     protected static LineNode parseLine(String line) throws InvalidFormatException {
-        String[] tokens = line.split(" ");
+        String[] tokens = line.split("\\s+");
         int depth = extractDepth(tokens);
         int pos = extractPos(tokens, depth);
         char r = extractRes(tokens, depth);
@@ -74,7 +76,7 @@ public class LineNode {
     private static int extractPos(String[] tokens, int depth) throws InvalidFormatException {
         int pos = 0;
         try {
-            String posString = tokens[depth + 1];
+            String posString = tokens[depth];
             pos = Integer.parseInt(posString.substring(posString.length() - 1));
         } catch (Exception e) {
             throw new InvalidFormatException();
@@ -85,7 +87,7 @@ public class LineNode {
     private static char extractRes(String[] tokens, int depth) throws InvalidFormatException {
         char r = 0;
         try {
-            String resString = tokens[depth + 3];
+            String resString = tokens[depth + 2];
             r = resString.charAt(0);
         } catch(Exception e) {
             throw new InvalidFormatException();

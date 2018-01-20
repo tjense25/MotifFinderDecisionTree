@@ -1,3 +1,5 @@
+package parser;
+
 import javafx.util.Pair;
 
 /**
@@ -33,29 +35,29 @@ public class LeafLineNode extends LineNode {
         return true;
     }
 
-    public static LineNode parseLeaf(String line) throws InvalidFormatException {
-        LineNode lineNode = parseLine(line);
-        String[] tokens = line.split(" ");
+    public static LineNode parseLeaf(String line) throws LineNode.InvalidFormatException {
+        LineNode lineNode = LineNode.parseLine(line);
+        String[] tokens = line.split("\\s+");
         Toxicity tox = extractToxClass(tokens, lineNode.getDepth());
         Pair<Integer, Integer> score = extractScore(tokens);
         return new LeafLineNode(lineNode, tox, score.getKey(), score.getValue());
     }
 
-    private static Toxicity extractToxClass(String[] tokens, int depth) throws InvalidFormatException{
+    private static Toxicity extractToxClass(String[] tokens, int depth) throws LineNode.InvalidFormatException {
         Toxicity tox = null;
         try {
-            String toxicity = tokens[depth + 4];
+            String toxicity = tokens[depth + 3];
             if (toxicity.equals("anti-toxic")) tox = Toxicity.ANTITOX;
             else if (toxicity.equals("toxic")) tox = Toxicity.TOXIC;
             else if (toxicity.equals("neutral")) tox = Toxicity.NEUTRAL;
             else throw new Exception();
         } catch (Exception e) {
-            throw new InvalidFormatException();
+            throw new LineNode.InvalidFormatException();
         }
         return tox;
     }
 
-    private static Pair<Integer, Integer> extractScore(String[] tokens) throws InvalidFormatException {
+    private static Pair<Integer, Integer> extractScore(String[] tokens) throws LineNode.InvalidFormatException {
         try {
             String scoreString = tokens[tokens.length - 1];
             scoreString = scoreString.substring(1, scoreString.length() - 1);
@@ -71,7 +73,7 @@ public class LeafLineNode extends LineNode {
             }
             return new Pair<>((int) count, (int) missclasified);
         } catch(Exception e) {
-            throw new InvalidFormatException();
+            throw new LineNode.InvalidFormatException();
         }
     }
 

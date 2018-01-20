@@ -1,3 +1,7 @@
+package tree;
+
+import parser.LineNode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,5 +44,22 @@ public class Node {
 
     public List<Node> getChildren() {
         return children;
+    }
+
+    public boolean isLeaf() {
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < this.depth; i++) {
+            sb.append("|\t");
+        }
+        sb.append(String.format("pos = %d, res = %s\n", this.position, this.residue));
+        for(Node node : children) {
+            sb.append(node.toString());
+        }
+        return sb.toString();
     }
 }
