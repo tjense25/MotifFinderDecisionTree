@@ -1,3 +1,5 @@
+import org.omg.CORBA.DynAnyPackage.Invalid;
+
 import java.io.*;
 import java.util.Scanner;
 
@@ -6,33 +8,60 @@ import java.util.Scanner;
  */
 public class DecisionTreeParser {
 
-    private Scanner input;
+    private Scanner scanner;
 
     public DecisionTreeParser(String input_file_name) throws IOException {
-            this.input = new Scanner(new BufferedReader(new FileReader(input_file_name)));
+            this.scanner = new Scanner(new BufferedReader(new FileReader(input_file_name)));
     }
 
     public DecisionTree getDecisionTree() {
         DecisionTree dt = new DecisionTree();
-        int depth = 0;
-        int prev_depth = -1;
-        DecisionTree.Node node = dt.getRoot();
-        DecisionTree.Node parent_node = dt.getRoot();
-        while(input.hasNext()) {
-            String line = input.nextLine();
-            String words[] = line.split(" ");
-            depth = 0;
-            while(words[depth].equals("|")) {
-                depth++;
-            }
-            String pos = words[depth + 1];
-            if(depth > prev_depth) {
+        addNode()
 
-            }
-
-        }
 
         return dt;
     }
+
+
+    private Node getNextNode() throws LineNode.InvalidFormatException {
+        LineNode line = null;
+        if(scanner.hasNext()) {
+           line = LineNode.parse(scanner.nextLine());
+            if(line.isLeaf()) return new LeafNode((LeafLineNode) line);
+            else return new Node(line);
+        }
+        return null;
+
+    }
+
+    private Node addNode(Node pnode, Node cnode) throws LineNode.InvalidFormatException {
+        if(cnode.getDepth() - 1 != pnode.getDepth()) {
+            return cnode;
+        }
+        pnode.addNode(cnode);
+        Node next_node = getNextNode();
+        if(next_node.getDepth() > cnode.getDepth()) {
+            next_node = addNode(cnode, next_node);
+        }
+        else if(next_node.getDepth() < cnode.getDepth()) {
+            return cnode;
+        }
+        else {
+            while(next_node.getDepth() == cnode.getDepth()) {
+                pnode.addNode(next_node);
+                next_node = getNextNode();
+            }
+            if(next_node.getDepth() > cnode.getDepth()) {
+                next_node = addNode(cnode, pnode);
+            }
+            else if(next_node.getDepth() < cnode.getDepth()) {
+                return next_node;
+            }
+        }
+        return null;
+    }
+
+
+
 
 }

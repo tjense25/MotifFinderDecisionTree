@@ -36,6 +36,10 @@ public class LineNode {
         return r;
     }
 
+    public boolean isLeaf() {
+        return false;
+    }
+
     public static LineNode parse(String line) throws InvalidFormatException {
         if(line.endsWith(")")) {
             return LeafLineNode.parseLeaf(line);
