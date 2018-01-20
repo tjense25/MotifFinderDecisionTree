@@ -56,7 +56,7 @@ public class Node {
         for (int i = 0; i < this.depth; i++) {
             sb.append("|\t");
         }
-        sb.append(String.format("pos = %d, res = %s\n", this.position, this.residue));
+        sb.append(String.format("pos%d = %c\n", this.position, this.residue));
         for(Node node : children) {
             sb.append(node.toString());
         }

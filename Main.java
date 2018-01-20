@@ -2,6 +2,7 @@ import parser.DecisionTreeParser;
 import tree.DecisionTree;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by tjense25 on 1/20/18.
@@ -23,6 +24,16 @@ public class Main {
             e.printStackTrace();
         }
         DecisionTree dt = treeParser.getDecisionTree();
-        System.out.println(dt.toString());
+        dt.findMotifs();
+        List<String> toxics = dt.getToxicMotifs();
+        System.out.println("TOXIC: ");
+        for (String motif : toxics) {
+            System.out.println(motif);
+        }
+        List<String> antitoxics = dt.getAntitoxicMotifs();
+        System.out.println("\nANTITOXIC: ");
+        for (String motif: antitoxics) {
+            System.out.println(motif);
+        }
     }
 }

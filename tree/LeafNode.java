@@ -12,6 +12,18 @@ public class LeafNode extends Node {
     private int count;
     private int misclassified;
 
+    public Toxicity getTox() {
+        return tox;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public int getMisclassified() {
+        return misclassified;
+    }
+
     public LeafNode(LeafLineNode line) {
         super(line);
         this.children = null;
@@ -31,7 +43,7 @@ public class LeafNode extends Node {
         for (int i = 0; i < getDepth(); i++) {
             sb.append("|\t");
         }
-        sb.append(String.format("pos = %d, res = %s", getPosition(), getResidue()));
+        sb.append(String.format("pos%d = %c: ", getPosition(), getResidue()));
         sb.append(String.format( " %s (%d/%d)\n", Toxicity.asString(tox), count, misclassified));
         return sb.toString();
     }
