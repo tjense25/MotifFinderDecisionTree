@@ -73,30 +73,32 @@ public class DecisionTree {
         }
     }
 
-    public List<String> getToxicMotifs() {
-        List<String> toxicMotifs = mapToList(toxicMotifList, 10);
+    public List<String> getToxicMotifs(int k) {
+        List<String> toxicMotifs = mapToList(toxicMotifList, k);
         return toxicMotifs;
     }
 
-    public List<String> getAntitoxicMotifs() {
-        List<String> antitoxicMotifs = mapToList(antitoxMotifList, 10);
+    public List<String> getAntitoxicMotifs(int k) {
+        List<String> antitoxicMotifs = mapToList(antitoxMotifList, k);
         return antitoxicMotifs;
     }
 
-    public List<String> getNeutralMotifs() {
-        List<String> neutralMotifs = mapToList(neutralMotifList, 10);
+    public List<String> getNeutralMotifs(int k) {
+        List<String> neutralMotifs = mapToList(neutralMotifList, k);
         return neutralMotifs;
     }
 
     private List<String> mapToList(Map<Double, List<String>> map, int count) {
+        boolean keep_count = true;
+        if(count == 0) keep_count = false;
         List<String> list = new ArrayList<>();
         for(Double doub : map.keySet()) {
             for(String motif : map.get(doub)) {
                 list.add(String.format("%s %f", motif, doub));
-                count--;
-                if(count < 0) break;
+                if(keep_count) count--;
+                if(keep_count && count <= 0) break;
             }
-            if(count < 0) break;
+            if(keep_count && count <= 0) break;
         }
         return list;
     }
