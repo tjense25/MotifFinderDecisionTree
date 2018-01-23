@@ -32,7 +32,7 @@ public class DecisionTreeParser {
         if(scanner.hasNext()) {
            String line_string = scanner.nextLine();
            if(line_string.matches("(\\s*|^=+.*|^RandomTree.*)")) return getNextNode();
-           else if (line_string.startsWith("Size of the tree:")) return null;
+           else if (line_string.startsWith("Size of the tree")) return null;
            line = LineNode.parse(line_string);
             if(line.isLeaf()) {
                 LeafLineNode leafLine = (LeafLineNode) line;

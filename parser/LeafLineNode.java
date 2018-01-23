@@ -47,6 +47,7 @@ public class LeafLineNode extends LineNode {
         Toxicity tox = null;
         try {
             String toxicity = tokens[depth + 3];
+            if(toxicity.equals(":")) toxicity = tokens[depth + 4];
             if (toxicity.equals("anti-toxic")) tox = Toxicity.ANTITOX;
             else if (toxicity.equals("toxic")) tox = Toxicity.TOXIC;
             else if (toxicity.equals("neutral")) tox = Toxicity.NEUTRAL;
