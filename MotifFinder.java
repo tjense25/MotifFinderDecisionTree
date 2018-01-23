@@ -1,5 +1,6 @@
 import parser.DecisionTreeParser;
-import tree.DecisionTree;
+import parser.LineNode;
+import tree.DecisionForest;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,19 +35,26 @@ public class MotifFinder {
 
     public void run(String text_file, int k) {
         DecisionTreeParser treeParser = null;
+        DecisionForest df = null;
         try {
             treeParser = new DecisionTreeParser(text_file);
+            df = treeParser.getDecisionForest();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (LineNode.InvalidFormatException e) {
+            System.out.println("ERROR: Text File has invalid Format. Cannot Parse.");
+            e.printStackTrace();
         }
-        DecisionTree dt = treeParser.getDecisionTree();
-        dt.findMotifs();
-        List<String> toxics = dt.getToxicMotifs(k);
+
+
+        df.findMotifs();
+
+        List<String> toxics = df.getToxicMotifs(k);
         System.out.println("TOXIC: ");
         for (String motif : toxics) {
             System.out.println(motif);
         }
-        List<String> antitoxics = dt.getAntitoxicMotifs(k);
+        List<String> antitoxics = df.getAntitoxicMotifs(k);
         System.out.println("\nANTITOXIC: ");
         for (String motif: antitoxics) {
             System.out.println(motif);

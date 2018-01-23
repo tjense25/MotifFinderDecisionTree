@@ -1,6 +1,6 @@
 package parser;
 
-import tree.DecisionTree;
+import tree.DecisionForest;
 import tree.LeafNode;
 import tree.Node;
 
@@ -18,22 +18,22 @@ public class DecisionTreeParser {
             this.scanner = new Scanner(new BufferedReader(new FileReader(input_file_name)));
     }
 
-    public DecisionTree getDecisionTree() {
-        DecisionTree dt = new DecisionTree();
-        try {
-            addNode(dt.getRoot(), getNextNode());
-        } catch (LineNode.InvalidFormatException e) {
-            System.out.println("ERROR: Text File has invalid Format. Cannot Parse.");
-            e.printStackTrace();
+    public DecisionForest getDecisionForest() throws LineNode.InvalidFormatException {
+        DecisionForest df = new DecisionForest();
+        while(scanner.hasNext()) {
+            addNode(df.addRoot(), getNextNode());
         }
-        return dt;
+        return df;
     }
 
 
     private Node getNextNode() throws LineNode.InvalidFormatException {
         LineNode line = null;
         if(scanner.hasNext()) {
-           line = LineNode.parse(scanner.nextLine());
+           String line_string = scanner.nextLine();
+           if(line_string.matches("(\\s*|^=+.*|^RandomTree.*)")) return getNextNode();
+           else if (line_string.startsWith("Size of the tree:")) return null;
+           line = LineNode.parse(line_string);
             if(line.isLeaf()) {
                 LeafLineNode leafLine = (LeafLineNode) line;
                 if (leafLine.getCount() == 0) return getNextNode(); //don't add nodes with 0 count to tree

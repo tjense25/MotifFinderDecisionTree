@@ -10,7 +10,7 @@ public class LineNode {
     //Amino Acid residue
     char r;
 
-    static class InvalidFormatException extends Exception {}
+    public static class InvalidFormatException extends Exception {}
 
     public LineNode() {}
 
