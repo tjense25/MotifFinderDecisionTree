@@ -1,6 +1,7 @@
 package tree;
 
 import com.sun.xml.internal.fastinfoset.util.CharArray;
+import parser.Toxicity;
 
 import java.util.*;
 
@@ -10,6 +11,7 @@ import java.util.*;
 public class DecisionForest {
 
     private List<Node> roots;
+    private Map<String, Motif> motifList;
     private Map<Double, List<String>> toxicMotifList;
     private Map<Double, List<String>> antitoxMotifList;
     private Map<Double, List<String>> neutralMotifList;
@@ -47,7 +49,7 @@ public class DecisionForest {
         toxicMotifList = new TreeMap<>(Collections.reverseOrder());
         antitoxMotifList = new TreeMap<>(Collections.reverseOrder());
         neutralMotifList = new TreeMap<>(Collections.reverseOrder());
-        StringBuilder motif = new StringBuilder("********");
+        StringBuilder motif = new StringBuilder("........");
         for(Node root: this.roots) {
             for (Node node : root.getChildren()) {
                 findMotifs(node, motif);
@@ -55,10 +57,32 @@ public class DecisionForest {
         }
     }
 
+    public void findForestMotifs() {
+        this.motifList = new HashMap<>();
+        StringBuilder motif = new StringBuilder("........");
+        for (Node root: this.roots) {
+            for (Node node : root.getChildren()) {
+                findForestMotifs(node, motif);
+            }
+        }
+
+        toxicMotifList = new TreeMap<>(Collections.reverseOrder());
+        antitoxMotifList = new TreeMap<>(Collections.reverseOrder());
+        neutralMotifList = new TreeMap<>(Collections.reverseOrder());
+        for (String motifKey : this.motifList.keySet()) {
+            Motif m = motifList.get(motifKey);
+            switch(m.getClassification()) {
+                case TOXIC: addToMap(toxicMotifList, m.getScore(), m.getFormat());
+                case ANTITOX: addToMap(antitoxMotifList, m.getScore(), m.getFormat());
+                case NEUTRAL: addToMap(neutralMotifList, m.getScore(), m.getFormat());
+            }
+        }
+    }
+
     public void findMotifs(Node node, StringBuilder motif) {
         StringBuilder new_motif = new StringBuilder(motif);
         new_motif.setCharAt(node.getPosition() - 1, node.getResidue());
-        if(node.isLeaf()) {
+        if (node.isLeaf()) {
             LeafNode leaf = (LeafNode) node;
             double score = leaf.getCount() / ((double) leaf.getMisclassified() + 1);
             String motif_format = String.format("%s (%d/%d)", new_motif.toString(), leaf.getCount(), leaf.getMisclassified());
@@ -69,9 +93,38 @@ public class DecisionForest {
             }
         }
         else {
-            for(Node child_node : node.getChildren()) {
+            for (Node child_node : node.getChildren()) {
                 findMotifs(child_node, new_motif);
             }
+        }
+    }
+
+    public void findForestMotifs(Node node, StringBuilder motif) {
+        StringBuilder new_motif = new StringBuilder(motif);
+        new_motif.setCharAt(node.getPosition() - 1, node.getResidue());
+        if(node.isLeaf()) {
+            LeafNode leaf = (LeafNode) node;
+            addToMotifs(motif.toString(), leaf.getTox(), leaf.getCount());
+        }
+        else {
+            for (Node child_node : node.getChildren()) {
+                findForestMotifs(child_node, new_motif);
+            }
+        }
+    }
+
+    private void addToMotifs(String motif, Toxicity tox, int count) {
+        if (this.motifList.containsKey(motif)) {
+            Motif m = motifList.get(motif);
+            switch(tox) {
+                case TOXIC: m.incrementTox(count);
+                case NEUTRAL: m.incrementNeu(count);
+                case ANTITOX: m.incrementAnti(count);
+            }
+        }
+        else {
+            Motif m = new Motif(motif, tox);
+            this.motifList.put(motif, m);
         }
     }
 
