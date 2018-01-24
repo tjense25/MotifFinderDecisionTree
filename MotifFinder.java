@@ -15,23 +15,23 @@ public class MotifFinder {
     public static void main(String[] args) {
         MotifFinder motifFinder = new MotifFinder();
         int k = 10;
-        if(args.length < 1) {
+        if (args.length < 1) {
             System.out.println("USAGE:\n java MotifFinder [decision_tree_file.txt] [# of motifs to find (default = 10)]\n" +
                                 "OPTIONS:\n" +
                                 "-a: get all Motifs from the tree\n" +
                                 "-RF: apply to a RandomForest output (by defualt applies to one decision tree)");
             return;
         }
-        else if(args.length > 1) {
-            if(args[1].equals("-a")) k = 0;
+        else if (args.length >= 1) {
+            if (args.length >=2 && args[1].equals("-a")) k = 0;
             else {
-                k = Integer.parseInt(args[1]);
+                if (args.length >= 2) k = Integer.parseInt(args[1]);
                 if (k <= 0) {
                     System.out.print("Value for k must be a positive integer");
                     return;
                 }
             }
-            if(args.length >= 3 && args[2].equals("-RF")) motifFinder.runForest(args[0], k);
+            if (args.length >= 3 && args[2].equals("-RF")) motifFinder.runForest(args[0], k);
             else motifFinder.run(args[0], k);
         }
     }

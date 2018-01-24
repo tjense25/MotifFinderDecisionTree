@@ -21,9 +21,9 @@ public class Motif {
         this.neuCount = 0;
         this.antiCount = 0;
         switch(tox) {
-            case TOXIC: toxCount++;
-            case NEUTRAL: neuCount++;
-            case ANTITOX: antiCount++;
+            case TOXIC: toxCount++; break;
+            case NEUTRAL: neuCount++; break;
+            case ANTITOX: antiCount++; break;
         }
         this.classification = null;
         this.score = null;
@@ -71,9 +71,9 @@ public class Motif {
         this.total_sum = toxCount + neuCount + antiCount;
         this.missclassified = total_sum;
         switch(this.classification) {
-            case TOXIC: missclassified -= toxCount;
-            case NEUTRAL: missclassified -= neuCount;
-            case ANTITOX: missclassified -= antiCount;
+            case TOXIC: missclassified -= toxCount; break;
+            case NEUTRAL: missclassified -= neuCount; break;
+            case ANTITOX: missclassified -= antiCount; break;
         }
         this.score = total_sum / ((double) missclassified + 1);
         return this.score;

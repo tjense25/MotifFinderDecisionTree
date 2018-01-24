@@ -72,9 +72,9 @@ public class DecisionForest {
         for (String motifKey : this.motifList.keySet()) {
             Motif m = motifList.get(motifKey);
             switch(m.getClassification()) {
-                case TOXIC: addToMap(toxicMotifList, m.getScore(), m.getFormat());
-                case ANTITOX: addToMap(antitoxMotifList, m.getScore(), m.getFormat());
-                case NEUTRAL: addToMap(neutralMotifList, m.getScore(), m.getFormat());
+                case TOXIC: addToMap(toxicMotifList, m.getScore(), m.getFormat()); break;
+                case ANTITOX: addToMap(antitoxMotifList, m.getScore(), m.getFormat()); break;
+                case NEUTRAL: addToMap(neutralMotifList, m.getScore(), m.getFormat()); break;
             }
         }
     }
@@ -87,9 +87,9 @@ public class DecisionForest {
             double score = leaf.getCount() / ((double) leaf.getMisclassified() + 1);
             String motif_format = String.format("%s (%d/%d)", new_motif.toString(), leaf.getCount(), leaf.getMisclassified());
             switch(leaf.getTox()) {
-                case TOXIC: addToMap(toxicMotifList, score, motif_format);
-                case ANTITOX: addToMap(antitoxMotifList, score, motif_format);
-                case NEUTRAL: addToMap(neutralMotifList, score, motif_format);
+                case TOXIC: addToMap(toxicMotifList, score, motif_format); break;
+                case ANTITOX: addToMap(antitoxMotifList, score, motif_format); break;
+                case NEUTRAL: addToMap(neutralMotifList, score, motif_format); break;
             }
         }
         else {
@@ -117,9 +117,9 @@ public class DecisionForest {
         if (this.motifList.containsKey(motif)) {
             Motif m = motifList.get(motif);
             switch(tox) {
-                case TOXIC: m.incrementTox(count);
-                case NEUTRAL: m.incrementNeu(count);
-                case ANTITOX: m.incrementAnti(count);
+                case TOXIC: m.incrementTox(count); break;
+                case NEUTRAL: m.incrementNeu(count); break;
+                case ANTITOX: m.incrementAnti(count); break;
             }
         }
         else {
