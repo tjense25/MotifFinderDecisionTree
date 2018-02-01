@@ -76,7 +76,6 @@ public class MotifFinder {
             System.out.println(motif.toString());
         }
         List<Motif> neutrals = df.getNeutralMotifs(k);
-        System.out.println("\nNEUTRAL: ");
         for (Motif motif : neutrals) {
             System.out.println(motif.toString());
         }
