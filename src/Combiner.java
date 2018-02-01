@@ -37,13 +37,10 @@ public class Combiner {
     public List<String> combineMotifs(List<Motif> motifs) {
         this.original_motifs = extractMotifs(motifs);
         this.combined_motifs = new ArrayList<>();
-        if ("...S....".matches("......D.")) {
-            System.out.println("hi");
-        }
         for (int i = 0; i < original_motifs.size(); i++) {
             boolean combined = false;
             for (int j = i + 1; j < original_motifs.size(); j++) {
-                if (original_motifs.get(j).matches(original_motifs.get(i))) {
+                if (isCombinable(original_motifs.get(j), original_motifs.get(i))) {
                     combined_motifs.add(combine(original_motifs.get(i), original_motifs.get(j)));
                     combined = true;
                 }
@@ -59,6 +56,7 @@ public class Combiner {
      * @param motif2 the second motif to be combined
      * @return a string regex representation of the two combined motifs
      * @pre motif1 and motif2 can be combined (i.e. the regex for motif1 is matched by regex of motif2 and vise versa)
+     * @pre motif1 and motif2 are of the same length
      * @post return value is the combined motif
      */
     private String combine(String motif1, String motif2) {
@@ -75,6 +73,22 @@ public class Combiner {
             }
         }
         return new_motif.toString();
+    }
+
+    /**
+     * Helper function for the CombineMotifs function. Checks the precondition to the combine function
+     * Function makes sure that the two motif strings do not conflict. So if the first motif is anything besides a wild card
+     * in any given position, the function will check if the 2nd motif has a wild card at that position or if they are equal
+     * @param m1 the first motif to test to see if the motifs can be combined
+     * @param m2 the second motif to test
+     * @return true is the two motif strings can be combined false if the two motifs can't
+     * @pre motif1 and motif2 are of the same length
+     */
+    private boolean isCombinable(String m1, String m2) {
+        for(int i = 0; i < m1.length(); i++) {
+            if (m1.charAt(i) != '.' && (m2.charAt(i) != '.' && m1.charAt(i) != m2.charAt(i))) return false;
+        }
+        return true;
     }
 
     /**
