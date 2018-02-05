@@ -4,12 +4,28 @@ import tree.DecisionForest;
 import tree.Motif;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by tjense25 on 1/20/18.
  */
 public class MotifFinder {
+
+    private String input_file;
+    private int k = 10;
+    private boolean combine = false;
+    private boolean noneu = false;
+    private boolean noanti = false;
+    private boolean notox = false;
+    private static final String USAGE = "USAGE:\n java MotifFinder [decision_tree_file.txt] [options]\n" +
+            "OPTIONS:\n" +
+            "-k [int]: specify the number of motifs of each class that you want to print\n" +
+            "-a: get all Motifs from the tree\n" +
+            "-c: combine the resulting motifs together to get a list of potential consensus motifs\n" +
+            "-noneu: No-neutral. Do not print out motifs for neutral data\n" +
+            "-notox: No-Toxic. Do not print out motifs for toxic data\n" +
+            "-noanti: No-Antitoxic. Do not print out motifs for antitoxic data\n";
 
     /**
      * Constructor
@@ -24,77 +40,109 @@ public class MotifFinder {
      */
     public static void main(String[] args) {
         MotifFinder motifFinder = new MotifFinder();
-        int k = 10;
-        boolean combine = false;
-        if (args.length < 1) {
-            System.err.println("USAGE:\n java MotifFinder [decision_tree_file.txt] [# of motifs to find (default = 10)]\n" +
-                                "OPTIONS:\n" +
-                                "-a: get all Motifs from the tree\n" +
-                                "-c: combine the resulting motifs together to get a list of potential consensus motifs");
-            return;
-        }
-        else if (args.length >= 1) {
-            if (args.length >=2 && args[1].equals("-a")) k = 0;
-            else {
-                if (args.length >= 2) k = Integer.parseInt(args[1]);
-                if (k <= 0) {
-                    System.err.print("Value for k must be a positive integer");
-                    return;
+        try {
+            motifFinder.input_file = args[0];
+            for (int i = 1; i < args.length; i++) {
+                switch (args[i]) {
+                    case "-k":
+                        motifFinder.k = Integer.parseInt(args[i + 1]);
+                        i++;
+                        break;
+                    case "-a":
+                        motifFinder.k = 0;
+                        break;
+                    case "-c":
+                        motifFinder.combine = true;
+                        break;
+                    case "-noneu":
+                        motifFinder.noneu = true;
+                        break;
+                    case "-notox":
+                        motifFinder.notox = true;
+                        break;
+                    case "-noanti":
+                        motifFinder.noanti = true;
+                        break;
                 }
             }
-            if (args.length >= 3 && args[2].equals("-c")) combine = true;
-            motifFinder.run(args[0], k, combine);
+        } catch(Exception e) {
+            System.err.println(USAGE);
+            return;
         }
+
+        motifFinder.run();
     }
 
     /**
-     * Non-static function to find motifs
-     * @param text_file output of the decision tree or random forest model which will be used to find motifs
-     * @param k the number of motifs to find for each toxicity class
-     * @param combine boolean value for whether or not to combine the motifs once they are found
+     * Non-static function to actually run the motifFinder algorithms
+     * @Pre input_file, and all other command line parameters have already been initialized
+     * @Post possible motifs are printed to the screen
      */
-    private void run(String text_file, int k, boolean combine) {
-        DecisionForest dt = parse(text_file);
-        dt.findMotifs();
-        printMotifs(dt, k, combine);
+    private void run() {
+        DecisionForest df = parse(input_file);
+        df.findMotifs();
+        printMotifs(df);
     }
 
     /**
      * Once motifs have been found prints the motifs to standard output.
      * @param df the decision forest storing the toxic, antitoxic, and neutral motifs
-     * @param k the number of motifs to print
-     * @param combine boolean value to determine whether to combine the motifs into a consensus motif
      */
-    private void printMotifs(DecisionForest df, int k, boolean combine) {
-        List<Motif> toxics = df.getToxicMotifs(k);
+    private void printMotifs(DecisionForest df) {
+        //Initialize classification motifs to empty array lists
+        List<Motif> toxics = new ArrayList<>();
+        List<Motif> antitoxics = new ArrayList<>();
+        List<Motif> neutrals = new ArrayList<>();
 
-        for (Motif motif : toxics) {
-            System.out.println(motif.toString());
-        }
-        List<Motif> antitoxics = df.getAntitoxicMotifs(k);
-        for (Motif motif: antitoxics) {
-            System.out.println(motif.toString());
-        }
-        List<Motif> neutrals = df.getNeutralMotifs(k);
-        for (Motif motif : neutrals) {
-            System.out.println(motif.toString());
+        //If user wants to display toxic get toxic motifs and print them to screen
+        if (!notox) {
+            toxics = df.getToxicMotifs(k);
+            for (Motif motif : toxics) {
+                System.out.println(motif.toString());
+            }
         }
 
-        if(combine) {
+        //If user wants to display anti get antitoxic motifs from decision forest and print them to screen
+        if (!noanti) {
+            antitoxics = df.getAntitoxicMotifs(k);
+            for (Motif motif : antitoxics) {
+                System.out.println(motif.toString());
+            }
+        }
+
+        if (!noneu) {
+            neutrals = df.getNeutralMotifs(k);
+            for (Motif motif : neutrals) {
+                System.out.println(motif.toString());
+            }
+        }
+
+        //If combine is true print combined as well depending on if user wants to display tox, anti, or neutral
+        if (combine) {
             System.out.println("\nCOMBINED MOTIFS:");
             System.out.println("===================");
             Combiner motifCombiner = new Combiner();
-            List<String> motifs = motifCombiner.combineMotifs(toxics);
-            for (String motif : motifs) {
-                System.out.println(String.format("%s\t%s", motif, "toxic"));
+            List<String> motifs = null;
+
+            if (!notox) {
+                motifs = motifCombiner.combineMotifs(toxics);
+                for (String motif : motifs) {
+                    System.out.println(String.format("%s\t%s", motif, "toxic"));
+                }
             }
-            motifs = motifCombiner.combineMotifs(antitoxics);
-            for (String motif : motifs) {
-                System.out.println(String.format("%s\t%s", motif, "antitoxic"));
+
+            if (!noanti) {
+                motifs = motifCombiner.combineMotifs(antitoxics);
+                for (String motif : motifs) {
+                    System.out.println(String.format("%s\t%s", motif, "antitoxic"));
+                }
             }
-            motifs = motifCombiner.combineMotifs(neutrals);
-            for (String motif : motifs) {
-                System.out.println(String.format("%s\t%s", motif, "neutral"));
+
+            if(!noneu) {
+                motifs = motifCombiner.combineMotifs(neutrals);
+                for (String motif : motifs) {
+                    System.out.println(String.format("%s\t%s", motif, "neutral"));
+                }
             }
         }
     }
